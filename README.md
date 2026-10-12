@@ -7,6 +7,8 @@
 - Nhập cảnh báo từ file JSON.
 - Nhận raw JSON trực tiếp từ Wazuh qua HTTP và API key.
 - Chuẩn hóa cảnh báo cơ bản và lưu vào SQLite.
+- Tạo event DataFrame bằng Pandas, loại Agent `000` và chuẩn hóa timestamp.
+- Tổng hợp dữ liệu cơ bản theo Agent và ngày.
 - Hiển thị bảng, tìm kiếm, lọc và các biểu đồ tổng quan.
 - Không phát triển hoặc sử dụng chức năng Telegram.
 
@@ -27,6 +29,8 @@ Raw Wazuh log
 
 Model và target chưa được chọn. Hai nội dung này chỉ được thực hiện sau khi kiểm tra dataset thật.
 
+Service tiền xử lý hiện nằm tại `src/services/data_preprocessing_service.py`.
+
 ## Chạy baseline
 
 ```powershell
@@ -46,4 +50,3 @@ python -m unittest discover -s tests -v
 ## Bảo mật dữ liệu
 
 Không commit API key, database thật hoặc raw log có thông tin nhạy cảm. Các file này đã được loại khỏi Git bằng `.gitignore`.
-
