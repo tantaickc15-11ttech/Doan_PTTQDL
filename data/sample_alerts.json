@@ -1,0 +1,87 @@
+[
+  {
+    "id": "demo-001",
+    "timestamp": "2026-09-01T08:15:10+07:00",
+    "agent": {"id": "001", "name": "WEB-SERVER", "ip": "192.168.10.11"},
+    "rule": {"id": "5710", "level": 5, "description": "Đăng nhập SSH thất bại", "groups": ["syslog", "sshd", "authentication_failed"]},
+    "location": "/var/log/auth.log"
+  },
+  {
+    "id": "demo-002",
+    "timestamp": "2026-09-01T09:20:33+07:00",
+    "agent": {"id": "001", "name": "WEB-SERVER", "ip": "192.168.10.11"},
+    "rule": {"id": "5712", "level": 10, "description": "Nhiều lần đăng nhập SSH thất bại", "groups": ["syslog", "sshd", "authentication_failures"]},
+    "location": "/var/log/auth.log"
+  },
+  {
+    "id": "demo-003",
+    "timestamp": "2026-09-01T11:02:45+07:00",
+    "agent": {"id": "002", "name": "DATABASE", "ip": "192.168.10.12"},
+    "rule": {"id": "550", "level": 7, "description": "Tệp hệ thống đã được thay đổi", "groups": ["ossec", "syscheck"]},
+    "location": "syscheck"
+  },
+  {
+    "id": "demo-004",
+    "timestamp": "2026-09-02T07:42:01+07:00",
+    "agent": {"id": "003", "name": "WORKSTATION-01", "ip": "192.168.10.21"},
+    "rule": {"id": "60122", "level": 3, "description": "Người dùng đăng nhập thành công", "groups": ["windows", "authentication_success"]},
+    "location": "EventChannel"
+  },
+  {
+    "id": "demo-005",
+    "timestamp": "2026-09-02T10:10:18+07:00",
+    "agent": {"id": "003", "name": "WORKSTATION-01", "ip": "192.168.10.21"},
+    "rule": {"id": "92045", "level": 12, "description": "Phát hiện tệp có dấu hiệu mã độc", "groups": ["windows", "malware"]},
+    "location": "EventChannel"
+  },
+  {
+    "id": "demo-006",
+    "timestamp": "2026-09-03T13:26:50+07:00",
+    "agent": {"id": "001", "name": "WEB-SERVER", "ip": "192.168.10.11"},
+    "rule": {"id": "31101", "level": 4, "description": "Yêu cầu HTTP không hợp lệ", "groups": ["web", "accesslog"]},
+    "location": "/var/log/nginx/access.log"
+  },
+  {
+    "id": "demo-007",
+    "timestamp": "2026-09-03T15:31:09+07:00",
+    "agent": {"id": "001", "name": "WEB-SERVER", "ip": "192.168.10.11"},
+    "rule": {"id": "31151", "level": 9, "description": "Nghi vấn quét lỗ hổng ứng dụng web", "groups": ["web", "attack"]},
+    "location": "/var/log/nginx/access.log"
+  },
+  {
+    "id": "demo-008",
+    "timestamp": "2026-09-04T08:05:27+07:00",
+    "agent": {"id": "002", "name": "DATABASE", "ip": "192.168.10.12"},
+    "rule": {"id": "100201", "level": 8, "description": "Dịch vụ cơ sở dữ liệu bị dừng", "groups": ["service", "availability"]},
+    "location": "/var/log/syslog"
+  },
+  {
+    "id": "demo-009",
+    "timestamp": "2026-09-04T14:17:36+07:00",
+    "agent": {"id": "004", "name": "WORKSTATION-02", "ip": "192.168.10.22"},
+    "rule": {"id": "60103", "level": 6, "description": "Tài khoản người dùng bị khóa", "groups": ["windows", "account_changed"]},
+    "location": "EventChannel"
+  },
+  {
+    "id": "demo-010",
+    "timestamp": "2026-09-05T09:54:22+07:00",
+    "agent": {"id": "004", "name": "WORKSTATION-02", "ip": "192.168.10.22"},
+    "rule": {"id": "92057", "level": 13, "description": "Phát hiện hành vi mã hóa nhiều tệp bất thường", "groups": ["windows", "ransomware"]},
+    "location": "EventChannel"
+  },
+  {
+    "id": "demo-011",
+    "timestamp": "2026-09-05T16:40:11+07:00",
+    "agent": {"id": "001", "name": "WEB-SERVER", "ip": "192.168.10.11"},
+    "rule": {"id": "5715", "level": 11, "description": "Đăng nhập SSH bằng tài khoản không tồn tại", "groups": ["syslog", "sshd", "authentication_failed"]},
+    "location": "/var/log/auth.log"
+  },
+  {
+    "id": "demo-012",
+    "timestamp": "2026-09-06T10:25:42+07:00",
+    "agent": {"id": "002", "name": "DATABASE", "ip": "192.168.10.12"},
+    "rule": {"id": "553", "level": 5, "description": "Tệp mới được thêm vào thư mục giám sát", "groups": ["ossec", "syscheck"]},
+    "location": "syscheck"
+  }
+]
+
