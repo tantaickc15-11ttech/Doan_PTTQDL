@@ -41,6 +41,16 @@ python scripts/profile_dataset.py data/wazuh_dataset_30days_level7_raw.json
 
 Kết quả được ghi vào `reports/profiling_report.json`. Bước này chỉ thống kê, không sửa raw data và không loại duplicate.
 
+## Validation và Cleaning
+
+Tạo CSV sạch và cleaning report:
+
+```powershell
+python scripts/clean_dataset.py data/wazuh_dataset_30days_level7_raw.json
+```
+
+Quy tắc duplicate: giữ bản ghi hợp lệ xuất hiện đầu tiên theo `alert.id`.
+
 ## Chạy baseline
 
 ```powershell
