@@ -7,10 +7,15 @@ __pycache__/
 integration/project_config.conf
 data/*.db
 data/*.db-journal
+data/wazuh_dataset_*_raw.json
 data/raw/*
 !data/raw/README.md
 data/processed/*
 !data/processed/README.md
+
+# Báo cáo sinh ra từ dataset thật
+reports/*.json
+!reports/README.md
 
 # IDE, hệ điều hành và file tạm
 .idea/
@@ -23,4 +28,3 @@ Thumbs.db
 # Kết quả kiểm thử
 .coverage
 htmlcov/
-

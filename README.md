@@ -31,6 +31,16 @@ Model và target chưa được chọn. Hai nội dung này chỉ được thự
 
 Service tiền xử lý hiện nằm tại `src/services/data_preprocessing_service.py`.
 
+## Profiling raw dataset
+
+Chạy thống kê baseline trước khi cleaning:
+
+```powershell
+python scripts/profile_dataset.py data/wazuh_dataset_30days_level7_raw.json
+```
+
+Kết quả được ghi vào `reports/profiling_report.json`. Bước này chỉ thống kê, không sửa raw data và không loại duplicate.
+
 ## Chạy baseline
 
 ```powershell
