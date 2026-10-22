@@ -18,5 +18,5 @@ python scripts/profile_dataset.py <duong-dan-dataset>
 python scripts/clean_dataset.py <duong-dan-dataset>
 ```
 
-Chi tiết từng lệnh nằm trong `docs/profile_dataset.md` và `docs/clean_dataset.md`.
+Chi tiết hai lệnh và đầu ra nằm trong `docs/DATA_PROCESSING.md`.
 

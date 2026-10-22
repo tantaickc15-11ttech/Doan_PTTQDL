@@ -96,13 +96,12 @@ python -m unittest discover -s tests -v
 
 - [APP_FLOW.md](docs/APP_FLOW.md): flow vận hành và call flow toàn ứng dụng.
 - [TECHNIQUE_MAPPING.md](docs/TECHNIQUE_MAPPING.md): kỹ thuật, biến và module.
-- [00_PHAM_VI_VA_REUSE.md](docs/00_PHAM_VI_VA_REUSE.md): phạm vi hiện tại.
-- [07_TANG_2_EDA.md](docs/07_TANG_2_EDA.md): nội dung EDA.
-- [model_service.md](docs/model_service.md): Pipeline, mô hình và đánh giá.
-- [external_validation_panel.md](docs/external_validation_panel.md): dữ liệu mới.
+- [DATA_PROCESSING.md](docs/DATA_PROCESSING.md): đọc, profiling và làm sạch dữ liệu.
+- [EDA_ANALYSIS.md](docs/EDA_ANALYSIS.md): EDA, ngoại lệ và quan hệ biến.
+- [MODEL_AND_EVALUATION.md](docs/MODEL_AND_EVALUATION.md): Pipeline, mô hình và đánh giá.
+- [README.md](docs/README.md): thứ tự đọc và phạm vi của bộ tài liệu.
 
-Mỗi file Python có xử lý trong `src`, `scripts` và `main.py` đều có file `.md`
-cùng tên trong `docs/`.
+Tài liệu được gom theo flow nghiệp vụ thay vì tách một file `.md` cho từng file Python.
 
 ## Bảo mật dữ liệu
 

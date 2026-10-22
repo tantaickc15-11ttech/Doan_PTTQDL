@@ -1,7 +1,8 @@
 # Flow vận hành ứng dụng
 
 Đây là điểm đọc đầu tiên để hiểu ứng dụng chạy theo thứ tự nào, dùng kỹ thuật
-gì và gọi đến file/hàm nào. Chi tiết từng module nằm trong file `.md` cùng tên.
+gì và gọi đến file/hàm nào. Chi tiết được gom theo nhóm trong
+`DATA_PROCESSING.md`, `EDA_ANALYSIS.md` và `MODEL_AND_EVALUATION.md`.
 
 ## 1. Khởi động
 

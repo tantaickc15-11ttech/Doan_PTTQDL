@@ -27,5 +27,6 @@ reader → profiling/cleaning → preprocessing/EDA
        → relationship/outlier → model_service → UI
 ```
 
-Xem `docs/TECHNIQUE_MAPPING.md` và các file `.md` cùng tên để biết chi tiết kỹ thuật.
+Xem `docs/DATA_PROCESSING.md`, `docs/EDA_ANALYSIS.md`,
+`docs/MODEL_AND_EVALUATION.md` và `docs/TECHNIQUE_MAPPING.md` để biết chi tiết kỹ thuật.
 

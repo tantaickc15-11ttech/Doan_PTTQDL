@@ -12,7 +12,7 @@ Agent/ngày và huấn luyện mô hình.
 ## Yêu cầu dữ liệu
 
 Các trường thời gian, Agent, rule level và các thuộc tính cảnh báo phải đúng schema mô tả
-trong `docs/02_DATASET_SCHEMA_DU_KIEN.md`. Các biến Agent/ngày được tạo trong service,
+trong `docs/DATA_PROCESSING.md`. Các biến Agent/ngày được tạo trong service,
 không phải nhập thủ công vào CSV.
 
 File dữ liệu phát sinh có thể tạo lại từ raw data và không được commit mặc định.
