@@ -9,8 +9,6 @@ data/*.db
 data/*.db-journal
 data/*.csv
 data/wazuh_dataset_*_raw.json
-data/external/*
-!data/external/README.md
 data/raw/*
 !data/raw/README.md
 data/processed/*

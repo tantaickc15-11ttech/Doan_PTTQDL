@@ -10,7 +10,6 @@ Quản lý dữ liệu đầu vào, dữ liệu sau làm sạch và bộ dữ li
 - `sample_alerts.json`: dữ liệu mẫu nhỏ để ứng dụng có thể khởi động và minh họa.
 - `raw/`: log Wazuh gốc, chưa làm sạch.
 - `processed/`: CSV đã chuẩn hóa để EDA và huấn luyện mô hình.
-- `external/`: CSV mới dùng kiểm thử mô hình cũ, không huấn luyện lại.
 - `alerts.db`: dữ liệu cục bộ phát sinh nếu có; không thuộc luồng chính hiện tại.
 - Các CSV đặt trực tiếp trong `data/`: dữ liệu làm việc cục bộ, bị loại khỏi Git.
 
@@ -22,7 +21,7 @@ raw JSON/CSV
   → processed/wazuh_cleaned.csv
   → EDA và huấn luyện HQTT/HQĐT
 
-external CSV
+CSV kiểm thử do người dùng chọn
   → chuẩn hóa đúng schema
   → Pipeline đã fit từ dữ liệu cũ
   → dự đoán và tính MSE/R², không fit lại

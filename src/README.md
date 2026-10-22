@@ -9,7 +9,6 @@ cửa sổ chính; UI nhận thao tác người dùng và gọi các service tư
 
 - `ui/`: cửa sổ, tab, bộ lọc và biểu đồ Tkinter/Matplotlib.
 - `services/`: đọc/làm sạch dữ liệu, EDA, quan hệ biến và mô hình học máy.
-- `models/`: namespace dành cho lớp mô tả dữ liệu; hiện chưa có model miền nghiệp vụ.
 - `__init__.py`: đánh dấu `src` là Python package.
 
 ## Nguyên tắc phụ thuộc
