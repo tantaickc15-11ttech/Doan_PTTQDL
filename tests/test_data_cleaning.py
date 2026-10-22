@@ -28,8 +28,17 @@ class DataCleaningServiceTests(unittest.TestCase):
         self.assertEqual(1, len(rows))
         self.assertEqual("First description", rows[0]["rule_description"])
         self.assertEqual("", rows[0]["event_id"])
+        self.assertEqual("3", rows[0]["rule_firedtimes"])
+        self.assertEqual("", rows[0]["dst_user"])
+        self.assertEqual("", rows[0]["src_ip"])
+        self.assertNotIn("agent_risk_index", rows[0])
+        self.assertNotIn("alert_risk_level", rows[0])
+        self.assertEqual(11, len(rows[0]))
         self.assertEqual(1, report["actions"]["removed_by_reason"]["duplicate_alert_id"])
         self.assertTrue(report["audit"]["equation_valid"])
+        self.assertEqual(
+            "***", report["sample_transformation"]["after"]["agent_name"]
+        )
 
     def test_removed_reasons_are_mutually_exclusive(self):
         records = [
@@ -72,6 +81,7 @@ class DataCleaningServiceTests(unittest.TestCase):
                 "id": "100",
                 "level": 7,
                 "description": description,
+                "firedtimes": 3,
                 "groups": ["security"],
                 "mitre": {"id": ["T1001"]},
             },

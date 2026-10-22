@@ -1,4 +1,8 @@
-"""Chạy profiling raw Wazuh dataset và xuất báo cáo JSON."""
+"""CLI chạy profiling raw Wazuh dataset và xuất báo cáo JSON.
+
+Script chỉ điều phối tham số và hiển thị tiến độ; kỹ thuật profiling one-pass
+nằm trong DataProfilingService để dùng chung với giao diện.
+"""
 
 import argparse
 import sys
@@ -16,6 +20,7 @@ from src.services.data_profiling_service import DataProfilingService
 
 
 def parse_arguments():
+    """Đọc đường dẫn raw dataset và báo cáo đầu ra."""
     parser = argparse.ArgumentParser(
         description="Thống kê raw Wazuh dataset trước cleaning."
     )
@@ -29,11 +34,13 @@ def parse_arguments():
 
 
 def main():
+    """Chạy profiling không sửa raw file rồi lưu bằng chứng chất lượng."""
     arguments = parse_arguments()
     source_path = Path(arguments.input_file)
     output_path = Path(arguments.output)
 
     def show_progress(rows):
+        """In số record đã profiling để theo dõi tiến độ CLI."""
         print(f"Đã profiling {rows:,} bản ghi...", flush=True)
 
     report = DataProfilingService.profile(

@@ -1,4 +1,9 @@
-"""Làm phẳng và chuẩn hóa raw alert Wazuh thành dataset phân tích."""
+"""Làm phẳng và chuẩn hóa raw alert Wazuh thành dataset phân tích.
+
+KỸ THUẬT: trích xuất JSON lồng nhau, ép kiểu và groupby Agent/thời gian.
+VẤN ĐỀ: raw alert có cấu trúc/kiểu không đồng nhất và nhiều alert mỗi ngày.
+TÁC DỤNG: tạo bảng phẳng nhất quán dùng cho EDA và mô hình.
+"""
 
 import pandas as pd
 
@@ -8,25 +13,21 @@ class DataPreprocessingService:
 
     EVENT_COLUMNS = [
         "timestamp",
-        "date",
-        "hour",
-        "agent_id",
         "agent_name",
-        "agent_ip",
+        "source_ip",
+        "src_ip",
+        "dst_user",
+        "target_user_name",
+        "event_id",
         "rule_id",
         "rule_level",
+        "rule_firedtimes",
         "rule_description",
-        "event_id",
-        "severity_value",
-        "target_user",
-        "source_ip",
-        "status",
-        "decoder",
-        "location",
     ]
 
     @staticmethod
     def _nested_value(data, path):
+        """Lấy an toàn giá trị từ đường dẫn JSON dạng `a.b.c`."""
         value = data
         for key in path.split("."):
             if not isinstance(value, dict):
@@ -36,7 +37,7 @@ class DataPreprocessingService:
 
     @classmethod
     def flatten_alert(cls, raw_alert):
-        """Lấy các field phân tích từ một raw JSON mà không tự điền sai ngữ nghĩa."""
+        """Lấy trường cần thiết từ JSON lồng nhau về một dòng phẳng chuẩn."""
         if not isinstance(raw_alert, dict):
             raise ValueError("Raw alert phải là một dictionary.")
 
@@ -50,14 +51,14 @@ class DataPreprocessingService:
             "agent_ip": agent.get("ip"),
             "rule_id": rule.get("id"),
             "rule_level": rule.get("level"),
+            "rule_firedtimes": rule.get("firedtimes"),
             "rule_description": rule.get("description"),
             "event_id": cls._nested_value(
                 raw_alert, "data.win.system.eventID"
             ),
-            "severity_value": cls._nested_value(
-                raw_alert, "data.win.system.severityValue"
-            ),
-            "target_user": cls._nested_value(
+            "dst_user": cls._nested_value(raw_alert, "data.dstuser"),
+            "src_ip": cls._nested_value(raw_alert, "data.srcip"),
+            "target_user_name": cls._nested_value(
                 raw_alert, "data.win.eventdata.targetUserName"
             ),
             "source_ip": cls._nested_value(
@@ -72,7 +73,11 @@ class DataPreprocessingService:
 
     @classmethod
     def build_event_dataframe(cls, records):
-        """Tạo DataFrame, lọc Manager và chuẩn hóa timestamp/kiểu dữ liệu."""
+        """Tạo DataFrame, lọc Manager và chuẩn hóa timestamp/kiểu dữ liệu.
+
+        agent.id=000 là Wazuh Manager chứ không phải endpoint cần phân tích;
+        timestamp lỗi bị loại vì không thể xếp alert vào đúng ngày.
+        """
         flattened = []
         for record in records:
             raw_alert = getattr(record, "raw_data", record)
@@ -95,16 +100,12 @@ class DataPreprocessingService:
         frame["rule_level"] = pd.to_numeric(
             frame["rule_level"], errors="coerce"
         ).astype("Int64")
-        frame["severity_value"] = pd.to_numeric(
-            frame["severity_value"], errors="coerce"
+        frame["rule_firedtimes"] = pd.to_numeric(
+            frame["rule_firedtimes"], errors="coerce"
         ).astype("Int64")
-
         identifier_columns = ["rule_id", "event_id"]
         for column in identifier_columns:
             frame[column] = frame[column].astype("string")
-
-        frame["date"] = frame["timestamp"].dt.date
-        frame["hour"] = frame["timestamp"].dt.hour.astype("Int64")
 
         for column in cls.EVENT_COLUMNS:
             if column not in frame:
@@ -114,7 +115,7 @@ class DataPreprocessingService:
 
     @staticmethod
     def aggregate_by_agent(frame, frequency="D"):
-        """Tổng hợp các chỉ số chắc chắn có ý nghĩa theo Agent và thời gian."""
+        """Groupby để gom nhiều alert thành một mẫu Agent/ngày cho mô hình."""
         if frame.empty:
             return pd.DataFrame(
                 columns=[
@@ -138,8 +139,8 @@ class DataPreprocessingService:
                 total_events=("rule_id", "size"),
                 avg_rule_level=("rule_level", "mean"),
                 max_rule_level=("rule_level", "max"),
-                unique_users=("target_user", "nunique"),
-                unique_source_ips=("source_ip", "nunique"),
+                unique_users=("target_user_name", "nunique"),
+                unique_source_ips=("src_ip", "nunique"),
                 unique_event_ids=("event_id", "nunique"),
             )
             .reset_index()

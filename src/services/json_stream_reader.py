@@ -1,4 +1,9 @@
-"""Duyệt từng bản ghi JSON mà không nạp toàn bộ file vào RAM."""
+"""Duyệt từng bản ghi JSON mà không nạp toàn bộ file vào RAM.
+
+KỸ THUẬT: streaming parser theo chunk cho JSON Array và JSON Lines.
+VẤN ĐỀ: file Wazuh có thể hàng trăm MB, đọc toàn bộ dễ treo giao diện/hết RAM.
+TÁC DỤNG: mỗi lần chỉ giữ một phần nhỏ và yield từng record cho bước sau.
+"""
 
 import json
 from pathlib import Path
@@ -12,7 +17,7 @@ class JsonStreamReader:
 
     @classmethod
     def iter_records(cls, file_path, chunk_size=DEFAULT_CHUNK_SIZE):
-        """Yield lần lượt các dictionary trong file JSON."""
+        """Nhận diện định dạng rồi yield từng dictionary theo cách streaming."""
         path = Path(file_path)
         if not path.exists():
             raise FileNotFoundError(f"Không tìm thấy file: {path}")
@@ -61,6 +66,7 @@ class JsonStreamReader:
 
     @staticmethod
     def _first_content_position(text):
+        """Tìm vị trí ký tự không phải khoảng trắng đầu tiên trong chunk."""
         for position, character in enumerate(text):
             if not character.isspace():
                 return position
@@ -68,6 +74,7 @@ class JsonStreamReader:
 
     @classmethod
     def _iter_json_array(cls, handle, buffer, position, chunk_size):
+        """Giải mã nối tiếp từng object trong một JSON Array lớn."""
         decoder = json.JSONDecoder()
         reached_end = False
         record_number = 0
@@ -126,6 +133,7 @@ class JsonStreamReader:
 
     @staticmethod
     def _iter_json_lines(handle, first_chunk, chunk_size):
+        """Đọc và giải mã từng dòng độc lập của định dạng JSON Lines."""
         pending = first_chunk
         line_number = 0
 

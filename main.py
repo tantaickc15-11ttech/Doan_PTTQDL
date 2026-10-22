@@ -1,23 +1,14 @@
-"""Điểm bắt đầu của ứng dụng phân tích cảnh báo Wazuh."""
+"""Điểm bắt đầu của ứng dụng phân tích cảnh báo Wazuh.
 
-from pathlib import Path
+File này chỉ khởi tạo Tkinter; toàn bộ xử lý dữ liệu nằm trong services và UI.
+"""
 
-from src.services.database_service import DatabaseService
 from src.ui.main_window import MainWindow
 
 
-BASE_DIR = Path(__file__).resolve().parent
-
-
 def main():
-    """Khởi tạo cấu hình, cơ sở dữ liệu và cửa sổ chính."""
-    database = DatabaseService(BASE_DIR / "data" / "alerts.db")
-    database.initialize()
-
-    app = MainWindow(
-        database=database,
-        sample_file=BASE_DIR / "data" / "sample_alerts.json",
-    )
+    """Khởi tạo cửa sổ phân tích chính."""
+    app = MainWindow()
     app.mainloop()
 
 

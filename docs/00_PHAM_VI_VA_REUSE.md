@@ -1,34 +1,34 @@
-# Phạm vi và phần tái sử dụng
+# Phạm vi và kiến trúc hiện tại
 
-## Phạm vi mới
+## Phạm vi đồ án
 
-Đồ án tập trung vào phân tích và trực quan dữ liệu cảnh báo Wazuh bằng ứng dụng Python desktop. Telegram không thuộc phạm vi phát triển mới.
+Ứng dụng desktop Python phân tích và trực quan dữ liệu cảnh báo Wazuh theo bốn
+tầng: làm sạch dữ liệu, EDA, xây dựng mô hình và trình bày/kiểm thử.
 
-## Phần tái sử dụng từ đồ án Lập trình Python
+Đồ án hiện tại không sử dụng Telegram, HTTP receiver thời gian thực, SQLite,
+danh sách cảnh báo vận hành hoặc trạng thái hệ thống. Thư mục `integration` đã
+được loại bỏ vì không tham gia luồng phân tích.
 
-| Thành phần | Cách sử dụng |
+## Thành phần đang sử dụng
+
+| Thành phần | Vai trò |
 |---|---|
-| `AlertReader` | Giữ làm đầu vào JSON, sau đó mở rộng cho dữ liệu lớn |
-| `Alert` | Giữ model cảnh báo cơ bản và raw JSON |
-| `DatabaseService` | Giữ bảng raw event và khả năng tìm kiếm |
-| `WazuhReceiver` | Giữ chức năng nhận log thật |
-| `AnalysisService` | Giữ thống kê cơ bản, tiếp tục mở rộng EDA |
-| `MainWindow` | Giữ khung Tkinter và Matplotlib |
-| Bộ kiểm thử | Giữ làm kiểm thử hồi quy |
+| `JsonStreamReader` | Đọc JSON Array/JSON Lines lớn theo streaming |
+| `DataProfilingService` | Thống kê chất lượng raw dataset trước cleaning |
+| `DataCleaningService` | Validation, dedup, chuẩn hóa và xuất CSV sạch |
+| `EdaService` | Lọc, thống kê và tổng hợp Agent/ngày |
+| `OutlierService` | IQR, KDE, skewness và kurtosis |
+| `RelationshipService` | Pearson, p-value và ANOVA |
+| `ModelService` | Pipeline HQTT/HQĐT, dự đoán và đánh giá |
+| `MainWindow` và các panel | Giao diện trình bày kết quả |
 
-## Phần không tái sử dụng
+## Chức năng đã hoàn thành
 
-- Telegram service và Telegram integration.
-- Báo cáo, slide và video của môn học cũ.
-- Database, API key và cấu hình thật.
+- Bộ lọc 7/14/30 ngày gần nhất, một ngày và khoảng ngày.
+- Thống kê mô tả, các biểu đồ EDA và heatmap mọi Alert Level thực có.
+- Phân tích ngoại lệ và quan hệ giữa biến.
+- HQTT đa biến và HQĐT có lựa chọn bậc.
+- MSE/R² trên tập train, Train/Test Split, K-Fold và dữ liệu độc lập mới.
 
-## Phần cần xây mới
-
-- Tiền xử lý bằng Pandas/NumPy.
-- Dataset tổng hợp theo Agent và thời gian.
-- Bộ lọc 3/7/15/30/90 ngày.
-- Thống kê mô tả.
-- Boxplot và IQR Outlier.
-- Correlation, ANOVA và chọn biến.
-- Model hồi quy sau khi chốt target.
+Mỗi file Python có xử lý được mô tả bằng một file cùng tên trong `docs/`.
 

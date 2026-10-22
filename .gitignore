@@ -7,7 +7,9 @@ __pycache__/
 integration/project_config.conf
 data/*.db
 data/*.db-journal
+data/*.csv
 data/wazuh_dataset_*_raw.json
+data/external/*
 data/raw/*
 !data/raw/README.md
 data/processed/*
@@ -28,3 +30,4 @@ Thumbs.db
 # Kết quả kiểm thử
 .coverage
 htmlcov/
+

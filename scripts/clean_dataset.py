@@ -1,4 +1,8 @@
-"""Chạy Validation/Cleaning và xuất CSV cùng báo cáo kiểm toán."""
+"""CLI chạy Validation/Cleaning và xuất CSV cùng báo cáo kiểm toán.
+
+Đây là điểm gọi DataCleaningService khi xử lý ngoài giao diện; công thức làm
+sạch chỉ nằm ở service để CLI và GUI không bị khác quy tắc.
+"""
 
 import argparse
 import sys
@@ -16,6 +20,7 @@ from src.services.data_cleaning_service import DataCleaningService
 
 
 def parse_arguments():
+    """Đọc đường dẫn input/output/report từ dòng lệnh."""
     parser = argparse.ArgumentParser(
         description="Validation và cleaning raw Wazuh dataset."
     )
@@ -34,9 +39,11 @@ def parse_arguments():
 
 
 def main():
+    """Chạy cleaning, lưu báo cáo và in số dòng để người dùng đối chiếu."""
     arguments = parse_arguments()
 
     def show_progress(rows):
+        """In số record đã cleaning để theo dõi tiến độ CLI."""
         print(f"Đã xử lý {rows:,} bản ghi...", flush=True)
 
     report = DataCleaningService.clean_to_csv(

@@ -1,64 +1,89 @@
-# Đồ án Phân tích và Trực quan dữ liệu Wazuh
+# Đồ án Phân tích và Trực quan dữ liệu cảnh báo Wazuh
 
-Ứng dụng Python desktop đọc cảnh báo Wazuh, lưu dữ liệu gốc, xây dựng dataset phân tích và trực quan hóa kết quả bằng Tkinter và Matplotlib.
+Ứng dụng Python desktop dùng Tkinter để làm sạch, phân tích, trực quan hóa và
+xây dựng mô hình dự đoán từ log cảnh báo Wazuh.
 
-## Phạm vi hiện tại
+## Trạng thái hiện tại
 
-- Nhập cảnh báo từ file JSON.
-- Nhận raw JSON trực tiếp từ Wazuh qua HTTP và API key.
-- Chuẩn hóa cảnh báo cơ bản và lưu vào SQLite.
-- Tạo event DataFrame bằng Pandas, loại Agent `000` và chuẩn hóa timestamp.
-- Tổng hợp dữ liệu cơ bản theo Agent và ngày.
-- Hiển thị bảng, tìm kiếm, lọc và các biểu đồ tổng quan.
-- Không phát triển hoặc sử dụng chức năng Telegram.
+Ứng dụng đã hoàn thành:
 
-## Hướng phát triển của đồ án mới
+1. Đọc, profiling, validation, loại trùng và chuẩn hóa raw JSON.
+2. EDA, lọc dữ liệu, heatmap, outlier IQR, Pearson và ANOVA.
+3. Dự đoán `total_events` bằng hồi quy tuyến tính đa biến và hồi quy đa thức.
+4. Đánh giá bằng MSE/R² trên tập train, Train/Test Split, K-Fold và dữ liệu mới.
+
+Ứng dụng không dùng Telegram, HTTP receiver thời gian thực hoặc SQLite trong
+luồng hiện tại. Thư mục `integration` đã được loại bỏ.
+
+## Flow tổng quát
 
 ```text
-Raw Wazuh log
-→ lọc Agent endpoint
-→ clean và chuẩn hóa
-→ dataset phân tích
-→ EDA
-→ Outlier IQR
-→ phân tích mối quan hệ
-→ chọn biến
-→ model nếu phù hợp
-→ dashboard
+Raw Wazuh JSON hoặc CSV sạch
+  → Profiling → Validation → Deduplication → Chuẩn hóa UTC/kiểu dữ liệu
+  → data/processed/wazuh_cleaned.csv
+  → Lọc EDA → Thống kê → Heatmap → IQR/KDE → Pearson/ANOVA
+  → Tổng hợp một dòng cho mỗi Agent/ngày
+  → Pipeline: điền khuyết + One-Hot agent_name
+  → HQTT đa biến / HQĐT
+  → dự đoán total_events
+  → MSE/R²: train 100% → Train/Test 80/20 → K-Fold → dữ liệu mới độc lập
 ```
 
-Model và target chưa được chọn. Hai nội dung này chỉ được thực hiện sau khi kiểm tra dataset thật.
+Luồng gọi hàm chi tiết: [docs/APP_FLOW.md](docs/APP_FLOW.md).
 
-Service tiền xử lý hiện nằm tại `src/services/data_preprocessing_service.py`.
+## Các tab giao diện
 
-## Profiling raw dataset
+- **Tổng quan**: KPI và biểu đồ mô tả theo bộ lọc.
+- **Quan sát dữ liệu**: bằng chứng trước/sau cleaning và bảng Agent/ngày.
+- **Phân tích**: Distribution, Boxplot/IQR/KDE, Pearson và ANOVA.
+- **Xây dựng mô hình**: HQTT/HQĐT, dự đoán, MSE/R², 80/20, K-Fold và chọn bậc.
+- **Kiểm thử dữ liệu mới**: dùng nguyên Pipeline cũ để predict, không fit lại.
 
-Chạy thống kê baseline trước khi cleaning:
+Bộ lọc hỗ trợ 7/14/30 ngày gần nhất, một ngày cụ thể và khoảng ngày. Khoảng
+gần nhất được tính từ timestamp mới nhất trong dataset.
 
-```powershell
-python scripts/profile_dataset.py data/wazuh_dataset_30days_level7_raw.json
+## Mô hình hiện tại
+
+- Target: `total_events` theo Agent/ngày.
+- Biến phân loại: `agent_name`, xử lý bằng One-Hot Encoding.
+- Biến số: `high_level_alerts`, `unique_rules`, `unique_event_ids`,
+  `unique_source_ips`, `unique_users`, `avg_rule_level`, `max_rule_level`.
+- Dòng không log có `total_events=0` để biểu đồ liên tục nhưng không dùng train.
+
+Mọi bước tiền xử lý và hồi quy nằm trong `sklearn.pipeline.Pipeline` để
+`fit()` và `predict()` luôn sử dụng cùng quy tắc.
+
+## Cấu trúc thư mục
+
+```text
+Code/
+├─ main.py                 Điểm khởi chạy Tkinter
+├─ src/services/           Logic dữ liệu, EDA và mô hình
+├─ src/ui/                 Các cửa sổ và panel giao diện
+├─ scripts/                Chạy profiling/cleaning bằng dòng lệnh
+├─ data/processed/         Dataset CSV sạch dùng bởi ứng dụng
+├─ reports/                Báo cáo profiling và cleaning
+├─ tests/                  Kiểm thử tự động
+└─ docs/                   Tài liệu hệ thống và từng file Python
 ```
 
-Kết quả được ghi vào `reports/profiling_report.json`. Bước này chỉ thống kê, không sửa raw data và không loại duplicate.
-
-## Validation và Cleaning
-
-Tạo CSV sạch và cleaning report:
-
-```powershell
-python scripts/clean_dataset.py data/wazuh_dataset_30days_level7_raw.json
-```
-
-Quy tắc duplicate: giữ bản ghi hợp lệ xuất hiện đầu tiên theo `alert.id`.
-
-## Chạy baseline
+## Cài đặt và chạy
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-Copy-Item .\integration\project_config.example.conf .\integration\project_config.conf
 python main.py
+```
+
+Nút **Thêm dữ liệu** nhận raw JSON hoặc CSV sạch. Xử lý file lớn chạy ở worker
+thread để không khóa giao diện.
+
+## Chạy xử lý bằng dòng lệnh
+
+```powershell
+python scripts/profile_dataset.py <duong-dan-raw.json>
+python scripts/clean_dataset.py <duong-dan-raw.json>
 ```
 
 ## Kiểm thử
@@ -67,6 +92,20 @@ python main.py
 python -m unittest discover -s tests -v
 ```
 
+## Bản đồ tài liệu
+
+- [APP_FLOW.md](docs/APP_FLOW.md): flow vận hành và call flow toàn ứng dụng.
+- [TECHNIQUE_MAPPING.md](docs/TECHNIQUE_MAPPING.md): kỹ thuật, biến và module.
+- [00_PHAM_VI_VA_REUSE.md](docs/00_PHAM_VI_VA_REUSE.md): phạm vi hiện tại.
+- [07_TANG_2_EDA.md](docs/07_TANG_2_EDA.md): nội dung EDA.
+- [model_service.md](docs/model_service.md): Pipeline, mô hình và đánh giá.
+- [external_validation_panel.md](docs/external_validation_panel.md): dữ liệu mới.
+
+Mỗi file Python có xử lý trong `src`, `scripts` và `main.py` đều có file `.md`
+cùng tên trong `docs/`.
+
 ## Bảo mật dữ liệu
 
-Không commit API key, database thật hoặc raw log có thông tin nhạy cảm. Các file này đã được loại khỏi Git bằng `.gitignore`.
+Không commit raw log có thông tin nhạy cảm, khóa truy cập hoặc dữ liệu hệ thống
+thật. Chỉ dùng dataset đã kiểm tra và ẩn thông tin khi đưa vào báo cáo.
+

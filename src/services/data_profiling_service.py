@@ -1,4 +1,9 @@
-"""Thống kê baseline của raw Wazuh dataset trước khi làm sạch."""
+"""Thống kê baseline của raw Wazuh dataset trước khi làm sạch.
+
+KỸ THUẬT: profiling một lượt (one-pass) kết hợp Counter và set.
+VẤN ĐỀ: phải biết thiếu trường, sai kiểu và trùng ID trước khi quyết định làm sạch.
+TÁC DỤNG: tạo bằng chứng trước xử lý mà không chỉnh sửa raw dataset.
+"""
 
 import json
 import math
@@ -21,6 +26,7 @@ class DataProfilingService:
         "agent.ip",
         "rule.id",
         "rule.level",
+        "rule.firedtimes",
         "rule.description",
         "rule.groups",
         "rule.mitre",
@@ -32,6 +38,8 @@ class DataProfilingService:
         "data.win.eventdata.targetUserName",
         "data.win.eventdata.ipAddress",
         "data.win.eventdata.status",
+        "data.dstuser",
+        "data.srcip",
         "full_log",
     ]
 
@@ -39,7 +47,7 @@ class DataProfilingService:
 
     @classmethod
     def profile(cls, file_path, progress_callback=None):
-        """Duyệt dataset một lần và trả về báo cáo chưa cleaning."""
+        """Duyệt đúng một lần và trả báo cáo chất lượng trước cleaning."""
         path = Path(file_path)
         started = time.perf_counter()
         started_at = datetime.now(timezone.utc)
@@ -57,6 +65,7 @@ class DataProfilingService:
         minimum_timestamp = None
         maximum_timestamp = None
 
+        # One-pass profiling: cập nhật mọi bộ đếm ngay khi record được stream tới.
         for record in JsonStreamReader.iter_records(path):
             total_rows += 1
             top_level_fields.update(record.keys())
@@ -157,6 +166,7 @@ class DataProfilingService:
 
     @staticmethod
     def _nested_value(record, dotted_path):
+        """Lấy an toàn một trường JSON lồng nhau theo đường dẫn dấu chấm."""
         value = record
         for key in dotted_path.split("."):
             if not isinstance(value, dict):
@@ -166,10 +176,12 @@ class DataProfilingService:
 
     @staticmethod
     def _is_missing(value):
+        """Nhận diện None, NaN và chuỗi rỗng để đếm missing."""
         return value is None or value == ""
 
     @staticmethod
     def _is_valid_rule_level(value):
+        """Kiểm tra rule level có thể biểu diễn bằng số nguyên hay không."""
         if isinstance(value, bool) or value is None:
             return False
         if isinstance(value, int):
@@ -186,6 +198,7 @@ class DataProfilingService:
 
     @staticmethod
     def _parse_timestamp(value):
+        """Parse timestamp về UTC để xác định phạm vi thời gian dataset."""
         if not isinstance(value, str) or not value.strip():
             return None
         normalized = value.strip().replace("Z", "+00:00")
@@ -199,10 +212,12 @@ class DataProfilingService:
 
     @staticmethod
     def _format_timestamp(value):
+        """Đổi datetime thành ISO 8601 hoặc None cho báo cáo JSON."""
         return value.isoformat() if value is not None else None
 
     @staticmethod
     def _percentage(value, total):
+        """Tính phần trăm, tránh chia cho 0 khi dataset rỗng."""
         if total == 0:
             return 0.0
         return round(value * 100 / total, 4)

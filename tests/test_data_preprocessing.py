@@ -10,7 +10,12 @@ class DataPreprocessingServiceTests(unittest.TestCase):
         self.endpoint_alert = {
             "timestamp": "2026-09-19T08:50:58.298+0000",
             "agent": {"id": "005", "name": "ENDPOINT-01", "ip": "10.0.0.5"},
-            "rule": {"id": "60122", "level": 10, "description": "Login failed"},
+            "rule": {
+                "id": "60122",
+                "level": 10,
+                "firedtimes": 4,
+                "description": "Login failed",
+            },
             "decoder": {"name": "windows_eventchannel"},
             "location": "EventChannel",
             "data": {
@@ -21,7 +26,9 @@ class DataPreprocessingServiceTests(unittest.TestCase):
                         "ipAddress": "192.168.1.50",
                         "status": "0xc000006d",
                     },
-                }
+                },
+                "dstuser": "destination-user",
+                "srcip": "10.10.10.10",
             },
         }
 
@@ -46,9 +53,13 @@ class DataPreprocessingServiceTests(unittest.TestCase):
         )
 
         self.assertEqual(1, len(frame))
-        self.assertEqual("005", frame.iloc[0]["agent_id"])
+        self.assertEqual("ENDPOINT-01", frame.iloc[0]["agent_name"])
         self.assertEqual("4625", frame.iloc[0]["event_id"])
-        self.assertEqual(8, frame.iloc[0]["hour"])
+        self.assertEqual(4, frame.iloc[0]["rule_firedtimes"])
+        self.assertEqual("destination-user", frame.iloc[0]["dst_user"])
+        self.assertEqual("10.10.10.10", frame.iloc[0]["src_ip"])
+        self.assertEqual("demo-user", frame.iloc[0]["target_user_name"])
+        self.assertEqual(11, len(frame.columns))
 
     def test_aggregate_by_agent_creates_expected_metrics(self):
         second_alert = dict(self.endpoint_alert)
@@ -72,4 +83,3 @@ class DataPreprocessingServiceTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
